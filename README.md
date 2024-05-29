@@ -12,7 +12,7 @@ NMRoss
 Gives an approximate 1H NMR when given a smiles or a IUPAC name of a molecule with maximum one aromatic ring and no double bonds.
 
 ## `🧑‍🔧:` Installation 
-Here are the steps to direclty install the nmross package using pip install.
+Here are the steps to directly install the nmross package using pip install.
 
 ## 1. Create a Virtual Environment 
 
@@ -98,8 +98,7 @@ mol
 One who would like to know which peak is the one of the terminal carbon would use the package like this. First:
 
 ```python
-from nmross.NMRoss import NMR
-from nmross.NMRoss import Show
+from nmross.NMRoss import NMR, Show
 plt, mol = NMR('CCO')
 mol
 ```
@@ -111,7 +110,13 @@ mol
 ```
 This shows that the primary carbon has hydrogens which are non equivalent to other hydrogens in the molecule.
 
+## Tests
 
+To run the tests, one would need to clone the repository as shown above and then simply write the line code below in the terminal. Be aware that you need to change direction in order to be in the correct file.
+```python
+pip install pytest
+pytest
+```
 
 
 
