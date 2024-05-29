@@ -110,7 +110,7 @@ mol
 ```
 This shows that the primary carbon has hydrogens which are non equivalent to other hydrogens in the molecule.
 
-## Tests
+## `📖:`Tests
 
 To run the tests, one would need to clone the repository as shown above and then simply write the line code below in the terminal. Be aware that you need to change direction in order to be in the correct file.
 ```python
