@@ -30,8 +30,6 @@ classifiers = [
 
 keywords = ['NMR']
 
-dynamic = ["version"]
-
 [project.urls]
 source = "https://github.com/CedricRossboth/nmross"
 tracker = "https://github.com/CedricRossboth/nmross/issues"
