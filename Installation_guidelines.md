@@ -27,7 +27,7 @@ pip install nmross
 ```
 ## 3. Install JupyterLab
 ```
-pip install jupyter lab
+pip install jupyterlab
 jupyter lab
 ```
 
@@ -73,7 +73,7 @@ pip install .
 Install jupyter lab in the nmross environment. You can launch jupyter lab by copying the second line.
 
 ```
-pip install jupyter lab
+pip install jupyterlab
 jupyter lab
 ```
 

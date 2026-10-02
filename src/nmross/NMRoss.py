@@ -34,7 +34,7 @@ def get_smiles(molecule_name : str):
         # Check if we got any results
         if results:
             # Return the SMILES encoding of the first result
-            return results[0].isomeric_smiles
+            return results[0].smiles  # PubChem renamed its SMILES fields in 2025; .smiles needs pubchempy>=1.0.5
         else:
             return "No results found for the given molecule name."
     except Exception as e:

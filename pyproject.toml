@@ -3,14 +3,14 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-version = "0.0.1"
+version = "0.0.2"
 name = "nmross"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {file = "LICENSE"}
 description = "Gives an approximate 1H NMR when given a smiles or a IUPAC name of a molecule with maximum one aromatic ring and no double bonds."
 dependencies = [ 
-    "pubchempy==1.0.4","numpy","rdkit","matplotlib","ipython"
+    "pubchempy>=1.0.5","numpy","rdkit","matplotlib","ipython"
 ]
 authors = [
     {name = "Cedric Rossboth", email = "cedric.rossboth@epfl.ch"}

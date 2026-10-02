@@ -26,7 +26,7 @@ What does the ¹H NMR spectrum of a molecule look like? NMRoss predicts it from 
 
 ## How to run
 ```bash
-pip install nmross ipython
+pip install "nmross @ git+https://github.com/CedricRossboth/NMRoss.git"
 python -c "from nmross.NMRoss import NMR; plt, mol = NMR('ibuprofen'); plt.savefig('ibuprofen.png', dpi=200, bbox_inches='tight')"
 ```
 Expected output: `ibuprofen.png`, the right-hand spectrum shown above. An internet connection is needed, because PubChem resolves the name and supplies the plot title.
