@@ -14,6 +14,9 @@ from rdkit import RDLogger
 lg = RDLogger.logger()
 lg.setLevel(RDLogger.CRITICAL)
 
+# Hydroxyl oxygen of a carboxylic acid (O-H single-bonded to a C=O carbon).
+CARBOXYLIC_ACID_OH = Chem.MolFromSmarts('[OX2H1][CX3]=[OX1]')
+
 def get_smiles(molecule_name : str):
     """
     Fetch the SMILES encoding for a molecule by its name using PubChem.
@@ -68,9 +71,13 @@ def multiplicity(smiles : str):
     Raises:
     ValueError: If the input SMILES string is invalid.
 
+    Hydrogens on the oxygen of a carboxylic acid are not included; alcohol hydrogens are.
+
     Example:
     >>> multiplicity('CCO')
     ({0: 2, 1: 3, 2: 0}, {0: 3, 1: 2, 2: 1})
+    >>> multiplicity('CC(=O)O')
+    ({0: 0}, {0: 3})
     """
     mol = Chem.MolFromSmiles(smiles)
     if not mol:
@@ -78,6 +85,12 @@ def multiplicity(smiles : str):
     
     # Dictionary of hydrogens bonded to each atom
     dict_Hs = {atom.GetIdx(): atom.GetTotalNumHs(includeNeighbors=True) for atom in mol.GetAtoms()}
+
+    # Carboxylic acid O-H protons are left out of the spectrum: they are broad, exchange
+    # with the solvent and sit around 10-13 ppm, outside what the increment model predicts.
+    # Alcohol and phenol O-H protons are kept.
+    for match in mol.GetSubstructMatches(CARBOXYLIC_ACID_OH):
+        dict_Hs[match[0]] = 0  # match[0] is the hydroxyl oxygen
     F_dict_Hs = {idx: count for idx, count in dict_Hs.items() if count != 0}
     
     dict_mult_Heavy = {atom.GetIdx(): 0 for atom in mol.GetAtoms() if atom.GetSymbol() == 'C' and dict_Hs[atom.GetIdx()] != 0}

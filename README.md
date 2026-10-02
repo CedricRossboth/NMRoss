@@ -1,127 +1,48 @@
-![Project Logo](assets/banner.png)
+# NMRoss: a fast, rule-based ¹H NMR spectrum predictor
 
-![Coverage Status](assets/coverage-badge.svg)
+What does the ¹H NMR spectrum of a molecule look like? NMRoss predicts it from a name or SMILES string in under a second, using empirical substituent-increment tables and first-order (n+1) splitting rather than quantum-chemical calculations.
 
-<h1 align="center">
-NMRoss
-</h1>
+![Predicted 1H NMR spectra of ethylbenzene (left) and ibuprofen (right)](figures/NMRoss_vs_exp_combined_dark_preview.png)
 
-<br>
+## Result
+- Scope: molecules with at most one aromatic ring and no C=C double bonds. Carbonyls, alcohols, amines and halides are supported. Carboxylic acid O–H protons are left out, as they are broad and appear outside the increment model's range.
+- Known limitation: in dialkyl ethers and on the alkoxy side of esters, the O–CH₂/O–CH₃ shift is underestimated by up to about 2 ppm (methyl acetate O–CH₃: 1.7 predicted vs 3.7 ppm experimental; diethyl ether: 2.0 predicted vs 3.5 ppm experimental; ethyl acetate: 2.3 vs 4.1 ppm). The substructure search reads these groups from the wrong side of the oxygen. Aryl ethers such as phenetole are unaffected.
+- Ethylbenzene shows the textbook pattern within 0.1 ppm of experiment (CDCl₃): CH₃ triplet at 1.23 ppm (exp. 1.24), CH₂ quartet at 2.62 ppm (exp. 2.65) and aromatic multiplet at 7.09–7.20 ppm (exp. 7.15–7.30).
+- The aromatic multiplicities are predicted correctly (ortho doublet, meta and para triplets) but merge into one cluster in the figure. Lines within a multiplet are drawn a fixed 0.06 ppm apart, which is 30 Hz at 500 MHz versus a real ortho coupling of about 7.5 Hz. Each multiplet is therefore wider than the gaps between the three predicted centres. The same fixed spacing makes the aliphatic multiplets look broader than in an experimental spectrum.
+- For ibuprofen, every predicted shift is within 0.5 ppm of experiment. The aromatic doublets come out at 7.14 / 6.89 ppm (exp. 7.22 / 7.10) and the α-CH₃ at 1.59 ppm (exp. 1.50).
 
+## Method
+- **Input:** IUPAC name or SMILES. Names are converted to SMILES through PubChem (`pubchempy`), and the molecule is parsed with RDKit.
+- **Alkyl hydrogens:** a base shift plus increments from functional groups up to four bonds away, attenuated as 1/(number of bonds)², following the increment scheme of Bell, Berry and Madigan (*Org. Magn. Reson.* 1984).
+- **Aromatic hydrogens:** ortho/meta/para substituent increments added to the benzene shift.
+- **Spectrum:** multiplicity from the number of neighbouring C–H hydrogens (n+1 rule), with Gaussian peaks scaled by the number of equivalent hydrogens.
+- **Software:** Python ≥ 3.10, RDKit, NumPy, Matplotlib, PubChemPy. Runs on a laptop and needs no GPU.
 
-Gives an approximate 1H NMR when given a smiles or a IUPAC name of a molecule with maximum one aromatic ring and no double bonds.
+## Repository layout
+- `src/nmross/NMRoss.py`: the whole predictor. `NMR(name)` plots a spectrum, and `Show(name, index)` highlights one hydrogen's peak.
+- `tests/test_NMRoss.py`: 81 pytest unit tests covering parsing, substituent search, shifts and plotting.
+- `report/project_report.ipynb`: project report explaining the approximations, the algorithms and worked examples.
+- `figures/`: README figure. `data/` is unused.
 
-## `🧑‍🔧:` Installation 
-Here are the steps to directly install the nmross package using pip install.
-
-## 1. Create a Virtual Environment 
-
-We advise you to create an environment where you want to work on the project. Then activate the environment:
+## How to run
+```bash
+pip install nmross ipython
+python -c "from nmross.NMRoss import NMR; plt, mol = NMR('ibuprofen'); plt.savefig('ibuprofen.png', dpi=200, bbox_inches='tight')"
 ```
-conda create -n nmross python=3.10
-conda activate nmross
+Expected output: `ibuprofen.png`, the right-hand spectrum shown above. An internet connection is needed, because PubChem resolves the name and supplies the plot title.
+
+In a notebook, `NMR('CCO')` draws the spectrum of ethanol and returns `(plt, mol)`. Display `mol` to see the atom indices, then call `Show('CCO', 0)` to highlight the peak of the hydrogens on atom 0.
+
+**From source, with tests:**
+```bash
+git clone https://github.com/CedricRossboth/NMRoss.git && cd NMRoss
+conda create -n nmross python=3.11 -y && conda activate nmross
+pip install . pytest
+pytest            # 6 tests query PubChem and need internet
 ```
-## 2. Install Package
-```
-pip install nmross
-```
-## 3. Install JupyterLab
-```
-pip install jupyter lab
-jupyter lab
-```
+If pip fails to install RDKit on your system, run `conda install -c conda-forge rdkit` first.
 
-## `👷‍♂️:` Local installation 
+## Context
+CH-200 Practical Programming in Chemistry (BA4, spring 2024), Section de Chimie et Génie Chimique, EPFL. Joint project with Oscar Rosseneu; full write-up in the [report](report/project_report.ipynb).
 
-## 1. Fork the Repository
-
-First, fork the repository to your own GitHub account. This creates a copy of the repository under your GitHub account.
-
-## 2. Clone the Repository
-
-Clone the forked repository to your local machine: replace 'your-username' with your username.
-```
-git clone https://github.com/your-username/nmross.git
-cd nmross
-```
-
-## 3. Create a Virtual Environment
-
-Create a new virtual environment to keep your dependencies isolated: and activate the environment.
-```
-conda create -n nmross python=3.10
-conda activate nmross
-```
-## 4. Install dependencies via conda
-
-To avoid any build issues when installing some of the necessary packages for installation, it is easier to install them using conda.
-```
-conda install -c conda-forge numpy matplotlib rdkit
-```
-
-
-
-
-## 5. Install the Package Locally
-
-With the virtual environment activated, install the package locally using 'pip install .': this installs the package that are in the current folder so make sure you are in the environment nmross.
-```
-pip install .
-```
-## 6. Install JupyterLab 
-
-Install jupyter lab in the nmross environment. You can launch jupyter lab by copying the second line.
-
-```
-pip install jupyter lab
-jupyter lab
-```
-
-
-## `🧠:` Usage
-
-
-The two main functions of this module are NMR(name : str) and Show(name : str, index : int).
-
-The function NMR takes as an input either the IUPAC name of the compound or the smiles representation of it. This function outputs a plot of the NMR of the molecule and the Mol object of the molecule. The plot appears automatically when using NMR(name), but if needed there is a Mol object that allows to see which atom on the molecule has which index.
-
-The function Show takes as inputs either the IUPAC name of the compound or the smiles representation of it and an index in the molecule. The function outputs a plot of the 1H NMR of the molecule with the peak of the atom chosen hihlighted and a Mol object with all equivalent hydrogens highlighted. The function only ever plots a NMR spectrum if the atom with the index chosen has at least one hydrogen. The plot appears automatically when using the Show() method but the Mol object needs to be stocked in a variable to be shown.
-
-One who only ever wants to know the 1H NMR of ethanol would use the package like this:
-
-```python
-from nmross.NMRoss import NMR
-plt, mol = NMR('CCO')
-mol
-```
-
-One who would like to know which peak is the one of the terminal carbon would use the package like this. First:
-
-```python
-from nmross.NMRoss import NMR, Show
-plt, mol = NMR('CCO')
-mol
-```
-
-The 'mol' code line serves to identify how the program gives the indices to the atoms in the molecule. One of these indices can then be used during the following step. In this case, the terminal carbon is the one that is meant to be identified. Thus, the next steps are:
-```python
-plt, mol = Show('CCO', 0)
-mol
-```
-This shows that the primary carbon has hydrogens which are non equivalent to other hydrogens in the molecule.
-
-## `📖:`Tests
-
-To run the tests, one would need to clone the repository as shown above and then simply write the line code below in the terminal. Be aware that you need to change direction in order to be in the correct file.
-```python
-pip install pytest
-pytest
-```
-
-
-
-
-
-
-
-
+**My contribution:** I developed the final search algorithm and implemented the logic behind the structure-search strategy. While Oscar initially explored identifying functional groups directly from SMILES strings, this led to too many ambiguous or contradictory cases. I instead developed a topology-based approach using substructure searches, which formed the basis of the final implementation. I also implemented the plotting and PubChem lookup components. We developed and tested parts of the code together, including through iterative prototyping, while the remaining code was written independently by both of us.

@@ -10,7 +10,7 @@ requires-python = ">=3.10"
 license = {file = "LICENSE"}
 description = "Gives an approximate 1H NMR when given a smiles or a IUPAC name of a molecule with maximum one aromatic ring and no double bonds."
 dependencies = [ 
-    "pubchempy==1.0.4","numpy","rdkit","matplotlib"
+    "pubchempy==1.0.4","numpy","rdkit","matplotlib","ipython"
 ]
 authors = [
     {name = "Cedric Rossboth", email = "cedric.rossboth@epfl.ch"}

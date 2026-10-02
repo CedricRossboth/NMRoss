@@ -34,6 +34,12 @@ def test_multiplicity_butanol():
     result = multiplicity(smiles)
     assert result == expected_result, f"Expected {expected_result}, but got {result}"
 
+def test_multiplicity_skips_carboxylic_acid_h_keeps_alcohol_h():
+    # Lactic acid CC(O)C(=O)O: alcohol O (index 2) keeps its H, acid O (index 5) is excluded.
+    mult, hydrogens = multiplicity('CC(O)C(=O)O')
+    assert hydrogens == {0: 3, 1: 1, 2: 1}
+    assert 5 not in mult
+
 if __name__ == "__main__":
     test_multiplicity_butanol()
     print("All tests passed.")
